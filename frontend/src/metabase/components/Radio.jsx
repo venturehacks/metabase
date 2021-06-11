@@ -11,6 +11,11 @@ import { color, lighten } from "metabase/lib/colors";
 import _ from "underscore";
 import cx from "classnames";
 
+const COLOR_BY_VARIANT = {
+  main: color("brand"),
+  admin: color("accent7"),
+};
+
 export default class Radio extends Component {
   static propTypes = {
     value: PropTypes.any,
@@ -23,6 +28,7 @@ export default class Radio extends Component {
     underlined: PropTypes.bool,
     showButtons: PropTypes.bool,
     py: PropTypes.number,
+    variant: PropTypes.oneOf(["main", "admin"]),
   };
 
   static defaultProps = {
@@ -32,6 +38,7 @@ export default class Radio extends Component {
     vertical: false,
     underlined: false,
     bubble: false,
+    variant: "main",
   };
 
   constructor(props, context) {
@@ -55,6 +62,7 @@ export default class Radio extends Component {
       yspace,
       py,
       showButtons = vertical && !bubble, // show buttons for vertical only by default
+      variant,
       ...props
     } = this.props;
 
@@ -77,6 +85,7 @@ export default class Radio extends Component {
           const last = index === options.length - 1;
           return (
             <Item
+              variant={variant}
               key={optionKeyFn(option)}
               selected={selected}
               last={last}
@@ -124,7 +133,9 @@ const BaseItem = styled.li.attrs({
   cursor: pointer;
   :hover {
     color: ${props =>
-      !props.showButtons && !props.selected ? color("brand") : null};
+      !props.showButtons && !props.selected
+        ? COLOR_BY_VARIANT[props.variant]
+        : null};
   }
 `;
 BaseItem.defaultProps = {
@@ -137,14 +148,15 @@ const NormalList = styled(BaseList).attrs({
   className: props => cx(props.className, { "text-bold": !props.showButtons }), // TODO: better way to merge classname?
 })``;
 const NormalItem = styled(BaseItem)`
-  color: ${props => (props.selected ? color("brand") : null)};
+  color: ${props => (props.selected ? COLOR_BY_VARIANT[props.variant] : null)};
 `;
 
 // UNDERLINE
 const UnderlinedList = styled(NormalList)``;
 const UnderlinedItem = styled(NormalItem)`
   border-bottom: 3px solid transparent;
-  border-color: ${props => (props.selected ? color("brand") : null)};
+  border-color: ${props =>
+    props.selected ? COLOR_BY_VARIANT[props.variant] : null};
 `;
 UnderlinedItem.defaultProps = {
   py: 2,
@@ -155,11 +167,17 @@ const BubbleList = styled(BaseList)``;
 const BubbleItem = styled(BaseItem)`
   font-weight: 700;
   border-radius: 99px;
-  color: ${props => (props.selected ? color("white") : color("brand"))};
+  color: ${props =>
+    console.log(props, "props") || props.selected
+      ? color("white")
+      : COLOR_BY_VARIANT[props.variant]};
   background-color: ${props =>
-    props.selected ? color("brand") : lighten("brand")};
+    props.selected
+      ? COLOR_BY_VARIANT[props.variant]
+      : lighten(COLOR_BY_VARIANT[props.variant])};
   :hover {
-    background-color: ${props => !props.selected && lighten("brand", 0.38)};
+    background-color: ${props =>
+      !props.selected && lighten(COLOR_BY_VARIANT[props.variant], 0.38)};
     transition: background 300ms linear;
   }
 `;

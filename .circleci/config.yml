@@ -39,7 +39,7 @@ executors:
     docker:
       - image: metabase/ci:java-16-lein-2.9.6-clj-1.10.3.822-04-22-2021
 
-  postgres:
+  postgres-9-6:
     working_directory: /home/circleci/metabase/metabase/
     docker:
       - image: metabase/ci:lein-2.9.5-clojure-1.10.3.814
@@ -72,7 +72,7 @@ executors:
           POSTGRES_DB: metabase_test
           POSTGRES_HOST_AUTH_METHOD: trust
 
-  mysql:
+  mysql-5-7:
     working_directory: /home/circleci/metabase/metabase/
     docker:
       - image: metabase/ci:lein-2.9.5-clojure-1.10.3.814
@@ -1007,7 +1007,7 @@ workflows:
           requires:
             - be-tests-ee
           e:
-            name: mysql
+            name: mysql-5-7
           driver: mysql
 
       - test-driver:
@@ -1070,7 +1070,7 @@ workflows:
           description: "(9.6)"
           requires:
             - be-tests-ee
-          e: postgres
+          e: postgres-9-6
           driver: postgres
 
       - test-driver:
